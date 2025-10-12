@@ -3,7 +3,10 @@ package com.example.controllers;
 import com.example.DTOs.UserDto;
 import com.example.services.UserService;
 
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +29,11 @@ public class UserController {
     @GetMapping("/{id}")
     public UserDto findUserById(@PathVariable Long id) {
         return userService.findUserById(id);
+    }
+    @ExceptionHandler(EntityNotFoundException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleEntityNotFound(EntityNotFoundException e) {
+        return "Пользователь не найден";
     }
 
     @GetMapping("/all")
