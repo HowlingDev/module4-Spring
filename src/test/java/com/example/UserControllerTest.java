@@ -2,6 +2,7 @@ package com.example;
 
 import com.example.DTOs.UserDto;
 import com.example.controllers.UserController;
+import com.example.services.KafkaProducerService;
 import com.example.services.UserService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,6 +37,9 @@ public class UserControllerTest {
     @MockitoBean
     UserService userService;
 
+    @MockitoBean
+    KafkaProducerService kafkaProducerService;
+
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -48,7 +52,7 @@ public class UserControllerTest {
         UserDto userDto = new UserDto(1L,"Vasya", "vasya@gmail.com", 20, LocalDate.of(2025,10,12));
         when(userService.create(any(UserDto.class))).thenReturn(userDto);
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/users/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isOk())
@@ -113,7 +117,7 @@ public class UserControllerTest {
         UserDto userDto = new UserDto(1L,"Vasya update", "vasya@gmail.com", 20, LocalDate.of(2025,10,12));
         when(userService.update(anyLong(), any(UserDto.class))).thenReturn(userDto);
 
-        mockMvc.perform(put("/users/{id}", userDto.getId())
+        mockMvc.perform(put("/users/update/{id}", userDto.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isOk())
@@ -129,7 +133,7 @@ public class UserControllerTest {
         UserDto userDto = new UserDto(1L,"Vasya update", "vasya@gmail.com", 20, LocalDate.of(2025,10,12));
         when(userService.update(anyLong(), any(UserDto.class))).thenThrow(EntityNotFoundException.class);
 
-        mockMvc.perform(put("/users/{id}", 1L)
+        mockMvc.perform(put("/users/update/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isInternalServerError());
@@ -139,15 +143,20 @@ public class UserControllerTest {
     public void updateUserTest_updateFailedBecauseOfBadRequest() throws Exception {
         when(userService.update(anyLong(), any(UserDto.class))).thenThrow(EntityNotFoundException.class);
 
-        mockMvc.perform(put("/users/{id}", 1L))
+        mockMvc.perform(put("/users/update/{id}", 1L))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void deleteUserTest() throws Exception {
+        //следующие 3 строки - это заглушка для perform
+        //без нее выдает NPE и не может выполнить getEmail в 60-й строке UserController
+        UserDto userDto = new UserDto();
+        userDto.setEmail(" ");
+        when(userService.findUserById(anyLong())).thenReturn(userDto);
         doNothing().when(userService).delete(anyLong());
 
-        mockMvc.perform(delete("/users/{id}", 1L))
+        mockMvc.perform(delete("/users/delete/{id}", 1L))
                 .andExpect(status().isOk());
     }
 }
