@@ -40,7 +40,7 @@ public class UserService {
     @Transactional
     public UserDto create(UserDto userDto) {
         User newUser = new User();
-        BeanUtils.copyProperties(userDto, newUser);
+        BeanUtils.copyProperties(userDto, newUser, "id");
         return convertToDto(userRepository.save(newUser));
     }
 
