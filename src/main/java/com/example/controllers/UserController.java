@@ -143,7 +143,10 @@ public EntityModel<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
                                @Parameter(description = "Идентификатор пользователя (должен быть не меньше 1)")
                                Long id) {
         try {
-            kafkaProducerService.sendMessage("actions", "DELETE " + userService.findUserById(id).getEmail());
+            UserDto userDto = userService.findUserById(id);
+            if (userDto != null) {
+                kafkaProducerService.sendMessage("actions", "DELETE " + userDto.getEmail());
+            }
         } catch (EntityNotFoundException e) {
             System.out.println("Пользователь не найден, поэтому сообщение не отправлено.");
         }

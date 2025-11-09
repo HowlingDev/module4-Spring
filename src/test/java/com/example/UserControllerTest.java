@@ -4,7 +4,6 @@ import com.example.DTOs.UserDto;
 import com.example.controllers.UserController;
 import com.example.services.KafkaProducerService;
 import com.example.services.UserService;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.persistence.EntityNotFoundException;
