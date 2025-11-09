@@ -14,3 +14,4 @@
 и отправляет email пользователю о том, что аккаунт создан/удален 
 
 Также этот сервис может быть вызван через api gateway из репозитория "module7-GatewayAPI"
+Добавлены dockerfile и docker-compose.yml
